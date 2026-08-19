@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//private/tmp/**)",
+      "Bash(curl -s -o /tmp/upload_resp.html -w '%{http_code} %{url_effective}\\\\n' -F 'case_name=smoketest ui' -F documents=@samples/case_demo/FIR.txt -F documents=@samples/case_demo/medical_report.txt http://127.0.0.1:5050/cases -L)",
+      "Read(//tmp/**)"
+    ]
+  }
+}

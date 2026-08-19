@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Trial Prep — Cases{% endblock %}
+{% block content %}
+
+<section class="panel">
+  <h1>New case</h1>
+  <form method="post" action="{{ url_for('create_case') }}" enctype="multipart/form-data" class="upload-form">
+    <label>
+      Case name <span class="hint">(optional — used to build the case ID)</span>
+      <input type="text" name="case_name" placeholder="e.g. State vs Suresh Kumar">
+    </label>
+    <label>
+      Documents <span class="hint">PDF, DOCX, TXT, PNG, JPG, WEBP — multiple allowed</span>
+      <input type="file" name="documents" multiple required
+             accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp">
+    </label>
+    <button type="submit">Start processing</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h1>Cases</h1>
+  {% if not cases %}
+    <p class="muted">No cases yet — upload documents above to start one.</p>
+  {% else %}
+    <table class="case-table">
+      <thead><tr><th>Case</th><th>Status</th><th>Documents</th><th></th></tr></thead>
+      <tbody>
+        {% for c in cases %}
+        <tr>
+          <td><a href="{{ url_for('case_detail', case_id=c.case_id) }}">{{ c.case_id }}</a></td>
+          <td><span class="badge badge-{{ c.state }}">{{ c.state.replace('_', ' ') }}</span></td>
+          <td>{{ c.doc_count if c.doc_count is defined else '—' }}</td>
+          <td><a href="{{ url_for('case_detail', case_id=c.case_id) }}">Open →</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</section>
+
+{% endblock %}

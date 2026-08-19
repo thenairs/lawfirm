@@ -1,0 +1,56 @@
+[
+  {
+    "citation": "IPC Section 302",
+    "title": "Punishment for murder",
+    "summary": "Prescribes punishment (death or life imprisonment, plus fine) for the offense of murder, as defined by the intent and knowledge elements in Section 300.",
+    "type": "statute"
+  },
+  {
+    "citation": "IPC Section 304",
+    "title": "Punishment for culpable homicide not amounting to murder",
+    "summary": "Covers homicide committed with intent to cause death or grievous hurt, or with knowledge likely to cause death, but lacking the specific elements that would make it murder under Section 300.",
+    "type": "statute"
+  },
+  {
+    "citation": "IPC Section 323",
+    "title": "Punishment for voluntarily causing hurt",
+    "summary": "General provision penalizing voluntarily causing hurt where no more specific aggravating provision (e.g. grievous hurt, use of a weapon) applies.",
+    "type": "statute"
+  },
+  {
+    "citation": "IPC Section 325",
+    "title": "Punishment for voluntarily causing grievous hurt",
+    "summary": "Applies where the hurt caused meets the statutory definition of 'grievous' (e.g. fracture, permanent disfigurement, danger to life) under Section 320.",
+    "type": "statute"
+  },
+  {
+    "citation": "IPC Section 341",
+    "title": "Punishment for wrongful restraint",
+    "summary": "Penalizes voluntarily obstructing a person so as to prevent that person from proceeding in a direction they have a right to proceed in.",
+    "type": "statute"
+  },
+  {
+    "citation": "IPC Section 34",
+    "title": "Acts done by several persons in furtherance of common intention",
+    "summary": "Establishes joint liability: when a criminal act is done by several persons in furtherance of a common intention, each is liable as if the act were done by them alone.",
+    "type": "statute"
+  },
+  {
+    "citation": "CrPC Section 154",
+    "title": "Information in cognizable cases",
+    "summary": "Governs how information about a cognizable offense is recorded by police as an FIR, including the requirement to record it in writing and provide a copy to the informant.",
+    "type": "statute"
+  },
+  {
+    "citation": "Indian Evidence Act Section 27",
+    "title": "How much of information received from accused may be proved",
+    "summary": "Allows a fact discovered as a direct consequence of information given by an accused in custody to be proved, even though that information amounts to a confession.",
+    "type": "statute"
+  },
+  {
+    "citation": "Indian Evidence Act Section 32",
+    "title": "Cases in which statement of relevant fact by person who is dead, etc., is relevant",
+    "summary": "Covers admissibility of statements (including dying declarations) by a person who cannot be called as a witness, where the statement relates to the cause of death or circumstances of the transaction.",
+    "type": "statute"
+  }
+]

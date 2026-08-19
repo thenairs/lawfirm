@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}{{ case_id }} — Trial Prep{% endblock %}
+{% block content %}
+
+<p class="back"><a href="{{ url_for('index') }}">← All cases</a></p>
+<h1 class="case-title">{{ case_id }}</h1>
+
+{% if status.state == "processing" %}
+  <meta http-equiv="refresh" content="4">
+  <section class="panel">
+    <p class="badge badge-processing">processing</p>
+    <p class="muted">This page refreshes automatically every few seconds.</p>
+    {% if status.recent_events %}
+    <h2>Recent activity</h2>
+    <ul class="event-log">
+      {% for e in status.recent_events %}
+        <li><span class="mono">{{ e.ts }}</span> — {{ e.node }}{% if e.doc_id %} ({{ e.doc_id[:8] }}){% endif %} → {{ e.status }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+
+{% elif status.state == "error" %}
+  <section class="panel">
+    <p class="badge badge-error">error</p>
+    <p>{{ status.message }}</p>
+    {% if status.recent_events %}
+    <h2>Recent activity</h2>
+    <ul class="event-log">
+      {% for e in status.recent_events %}
+        <li><span class="mono">{{ e.ts }}</span> — {{ e.node }}{% if e.doc_id %} ({{ e.doc_id[:8] }}){% endif %} → {{ e.status }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+
+{% else %}
+  {% set cf = status.case_file %}
+  {% set s = cf.report_draft.sections %}
+
+  <section class="panel">
+    <p class="badge badge-{{ status.state }}">{{ status.state.replace('_', ' ') }}</p>
+    <p class="disclaimer">{{ cf.report_draft.disclaimer }}</p>
+    {% if status.state == "approved" %}
+      <p>Approved by <strong>{{ cf.review.reviewer }}</strong> on {{ cf.review.reviewed_at }}</p>
+      <p class="downloads">
+        <a class="button" href="{{ url_for('download', case_id=case_id, fmt='docx') }}">Download DOCX</a>
+        <a class="button" href="{{ url_for('download', case_id=case_id, fmt='pdf') }}">Download PDF</a>
+      </p>
+    {% else %}
+      <form method="post" action="{{ url_for('approve', case_id=case_id) }}" class="review-form">
+        <input type="text" name="reviewer" placeholder="Your name" required>
+        <button type="submit" class="button-primary">Approve &amp; export</button>
+      </form>
+      <form method="post" action="{{ url_for('revise', case_id=case_id) }}" class="review-form">
+        <input type="text" name="reviewer" placeholder="Your name" required>
+        <input type="text" name="notes" placeholder="What should change?" required>
+        <button type="submit">Request revision</button>
+      </form>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>Documents</h2>
+    <table class="doc-table">
+      <thead><tr><th>File</th><th>Category</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for d in cf.documents %}
+        <tr>
+          <td>{{ d.filename }}</td>
+          <td>{{ d.category or '—' }}</td>
+          <td><span class="badge badge-{{ 'ok' if d.status == 'processed' else 'warn' }}">{{ d.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Case overview</h2>
+    <p>{{ s.case_overview }}</p>
+  </section>
+
+  <section class="panel">
+    <h2>Chronological timeline</h2>
+    {% if cf.timeline %}
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Event</th><th>Status</th><th>Source</th></tr></thead>
+      <tbody>
+        {% for e in cf.timeline %}
+        <tr>
+          <td class="nowrap">{{ e.date }}</td>
+          <td>{{ e.event }}</td>
+          <td><span class="badge badge-{{ 'ok' if e.status == 'confirmed' else 'warn' }}">{{ e.status }}</span></td>
+          <td class="mono small">{{ e.source_doc_ids | join(', ') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="muted">No timeline generated.</p>{% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>Evidence summary</h2>
+    {% if cf.evidence_matrix %}
+    <table class="data-table">
+      <thead><tr><th>Item</th><th>Supports</th><th>Reliability</th><th>Weaknesses</th></tr></thead>
+      <tbody>
+        {% for e in cf.evidence_matrix %}
+        <tr>
+          <td>{{ e.item }}</td>
+          <td><span class="badge badge-side-{{ e.supports }}">{{ e.supports }}</span></td>
+          <td>{{ e.reliability }} <span class="muted small">— {{ e.reliability_reason }}</span></td>
+          <td>{{ e.weaknesses }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="muted">No evidence extracted.</p>{% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>Witness summary</h2>
+    {% if cf.witness_summary %}
+      {% for w in cf.witness_summary %}
+      <article class="witness-card">
+        <h3>{{ w.name }} <span class="muted">({{ w.role }})</span></h3>
+        <p>{{ w.statement_summary }}</p>
+        {% if w.contradictions %}
+          <p class="label">Contradictions</p>
+          <ul>{% for c in w.contradictions %}<li>vs {{ c.with }}: {{ c.detail }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% if w.cross_examination_questions %}
+          <p class="label">Suggested cross-examination</p>
+          <ol>{% for q in w.cross_examination_questions %}<li>{{ q }}</li>{% endfor %}</ol>
+        {% endif %}
+      </article>
+      {% endfor %}
+    {% else %}<p class="muted">No witness statements analyzed.</p>{% endif %}
+  </section>
+
+  <section class="panel two-col">
+    <div>
+      <h2>Case strengths</h2>
+      <ul>{% for x in s.case_strengths %}<li>{{ x }}</li>{% endfor %}</ul>
+    </div>
+    <div>
+      <h2>Case weaknesses</h2>
+      <ul>{% for x in s.case_weaknesses %}<li>{{ x }}</li>{% endfor %}</ul>
+    </div>
+  </section>
+
+  <section class="panel two-col">
+    <div>
+      <h2>Missing documents</h2>
+      <ul>{% for x in s.missing_documents %}<li>{{ x }}</li>{% endfor %}</ul>
+    </div>
+    <div>
+      <h2>Risks</h2>
+      <ul>{% for x in s.risks %}<li>{{ x }}</li>{% endfor %}</ul>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Applicable laws</h2>
+    <ul>
+      {% for p in cf.legal_research.applicable_provisions %}<li><strong>{{ p.citation }}</strong> — {{ p.relevance }}</li>{% endfor %}
+      {% for p in cf.legal_research.precedents %}<li><strong>{{ p.citation }}</strong> — {{ p.holding }} — {{ p.relevance_to_case }}</li>{% endfor %}
+    </ul>
+    {% if cf.legal_research.gaps %}
+      <p class="label">Research gaps</p>
+      <ul class="muted">{% for g in cf.legal_research.gaps %}<li>{{ g }}</li>{% endfor %}</ul>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>Final trial brief</h2>
+    <p>{{ s.final_trial_brief }}</p>
+  </section>
+{% endif %}
+
+{% endblock %}
